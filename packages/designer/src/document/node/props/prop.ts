@@ -148,7 +148,6 @@ export class Prop implements IPropParent {
         name: schema.name,
       };
     }
-
     if (type === 'map') {
       if (!this._items) {
         return this._value;
@@ -165,10 +164,20 @@ export class Prop implements IPropParent {
       });
       return maps;
     }
-
     if (type === 'list') {
+      // mobx-vue proxy 赋值问题
+      const listNew: { [key: string]: any; }[] = [];
+      const list = Object.assign({}, this._value);
+      Object.keys(list).forEach(listKey => {
+        const itemNew: CompositeValue = {};
+        Object.keys(list[listKey]).forEach(key => {
+          itemNew[key] = list[listKey][key]
+        })
+        listNew.push(itemNew);
+      })
       if (!this._items) {
-        return this._value;
+        return listNew;
+        // return this._value;
       }
       return this.items!.map((prop) => {
         return prop.export(stage);

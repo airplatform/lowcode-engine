@@ -43,21 +43,22 @@ export class History {
     }, (data) => {
       if (this.asleep) return;
       untracked(() => {
-        const log = currentSerialization.serialize(data);
-          if (this.session.isActive()) {
-            this.session.log(log);
-          } else {
-            this.session.end();
-            const lastState = this.getState();
-            const cursor = this.session.cursor + 1;
-            const session = new Session(cursor, log, this.timeGap);
-            this.session = session;
-            this.records.splice(cursor, this.records.length - cursor, session);
-            const currentState = this.getState();
-            if (currentState !== lastState) {
-              this.emitter.emit('statechange', currentState);
-            }
-          }
+        delete data.dataSource
+        // const log = currentSerialization.serialize(data);
+        //   if (this.session.isActive()) {
+        //     this.session.log(log);
+        //   } else {
+        //     this.session.end();
+        //     const lastState = this.getState();
+        //     const cursor = this.session.cursor + 1;
+        //     const session = new Session(cursor, log, this.timeGap);
+        //     this.session = session;
+        //     this.records.splice(cursor, this.records.length - cursor, session);
+        //     const currentState = this.getState();
+        //     if (currentState !== lastState) {
+        //       this.emitter.emit('statechange', currentState);
+        //     }
+        //   }
         // }
       });
     }, { fireImmediately: true });

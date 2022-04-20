@@ -35,6 +35,7 @@ export default class Material {
    * @returns
    */
   setAssets(assets: AssetsJson) {
+    // debugger;
     return this[editorSymbol].setAssets(assets);
   }
 

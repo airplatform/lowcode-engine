@@ -34,7 +34,7 @@ export class ProjectView extends Component<{ designer: Designer }> {
     return (
       <div className="lc-project">
         <div className="lc-simulator-shell">
-          {!project?.simulator?.renderer && <Loading />}
+          {/* {!project?.simulator?.renderer && <Loading />} */}
           <Simulator {...simulatorProps} />
         </div>
       </div>

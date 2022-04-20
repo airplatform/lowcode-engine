@@ -411,15 +411,15 @@ export class BuiltinSimulatorHost implements ISimulatorHost<BuiltinSimulatorProp
     // TODO: !!! thinkof reload onloa
 
     // wait 业务组件被第一次消费，否则会渲染出错
-    await this.componentsConsumer.waitFirstConsume();
+    // await this.componentsConsumer.waitFirstConsume();
 
-    // wait 运行时上下文
-    await this.injectionConsumer.waitFirstConsume();
+    // // wait 运行时上下文
+    // await this.injectionConsumer.waitFirstConsume();
 
-    if (Object.keys(this.asyncLibraryMap).length > 0) {
-      // 加载异步Library
-      await renderer.loadAsyncLibrary(this.asyncLibraryMap);
-    }
+    // if (Object.keys(this.asyncLibraryMap).length > 0) {
+    //   // 加载异步Library
+    //   await renderer.loadAsyncLibrary(this.asyncLibraryMap);
+    // }
 
     // step 5 ready & render
     renderer.run();
