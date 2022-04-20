@@ -166,15 +166,15 @@ export class Prop implements IPropParent {
     }
     if (type === 'list') {
       // mobx-vue proxy 赋值问题
-      const listNew: { [key: string]: any; }[] = [];
+      const listNew: { [key: string]: any }[] = [];
       const list = Object.assign({}, this._value);
       Object.keys(list).forEach(listKey => {
         const itemNew: CompositeValue = {};
         Object.keys(list[listKey]).forEach(key => {
-          itemNew[key] = list[listKey][key]
-        })
+          itemNew[key] = list[listKey][key];
+        });
         listNew.push(itemNew);
-      })
+      });
       if (!this._items) {
         return listNew;
         // return this._value;

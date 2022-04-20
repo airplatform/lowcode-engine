@@ -43,7 +43,7 @@ export class History {
     }, (data) => {
       if (this.asleep) return;
       untracked(() => {
-        delete data.dataSource
+        delete data.dataSource;
         // const log = currentSerialization.serialize(data);
         //   if (this.session.isActive()) {
         //     this.session.log(log);
