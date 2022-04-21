@@ -158,7 +158,7 @@ export class Prop implements IPropParent {
           const v = prop.export(stage);
           if (v != null) {
             maps = maps || {};
-            maps[prop.key || key] = prop.export(stage);
+            maps[prop.key || key] = v;
           }
         }
       });
@@ -179,9 +179,13 @@ export class Prop implements IPropParent {
         return listNew;
         // return this._value;
       }
-      return this.items!.map((prop) => {
+      const values = this.items!.map((prop) => {
         return prop.export(stage);
       });
+      if (values.every(val => val === undefined)) {
+        return undefined;
+      }
+      return values;
     }
   }
 

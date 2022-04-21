@@ -68,6 +68,8 @@ class Home$$Page extends Component {
 
   constructor(props, context) {
     super(props);
+
+    __$$i18n._inject2(this);
   } /* end of constructor */
 
   componentDidMount() {
@@ -166,11 +168,6 @@ class Home$$Page extends Component {
     );
   } /* end of render */
 
-  _i18nText(t) {
-    const locale = this._context.getLocale();
-    return t[locale] ?? t[String(locale).replace('-', '_')] ?? t[t.use || 'zh_CN'] ?? t.en_US;
-  }
-
   _createContext() {
     const self = this;
     const context = {
@@ -248,7 +245,7 @@ class Home$$Page extends Component {
           options: function () {
             return {
               method: 'GET',
-              uri: 'https://shs.alibaba-inc.com/mock/1458/demo/user',
+              uri: 'https://shs.xxx.com/mock/1458/demo/user',
               isSync: true,
             };
           },
@@ -339,13 +336,7 @@ export default Home$$Page;
 function __$$eval(expr) {
   try {
     return expr();
-  } catch (err) {
-    try {
-      if (window.handleEvalError) {
-        window.handleEvalError('Failed to evaluate: ', expr, err);
-      }
-    } catch (e) {}
-  }
+  } catch (error) {}
 }
 
 function __$$evalArray(expr) {

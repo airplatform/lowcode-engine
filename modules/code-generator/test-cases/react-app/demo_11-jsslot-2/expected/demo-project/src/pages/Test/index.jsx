@@ -1,3 +1,5 @@
+// 注意: 出码引擎注入的临时变量默认都以 "__$$" 开头，禁止在搭建的代码中直接访问。
+// 例外：react 框架的导出名和各种组件名除外。
 import React from "react";
 
 import {
@@ -25,7 +27,7 @@ import {
 
 import utils, { RefsManager } from "../../utils";
 
-import { i18n as _$$i18n } from "../../i18n";
+import * as __$$i18n from "../../i18n";
 
 import "./index.css";
 
@@ -36,12 +38,16 @@ const AliAutoSearchTableDefault = AliAutoSearchTable.default;
 const NextBlockCell = NextBlock.Cell;
 
 class Test$$Page extends React.Component {
+  _context = this;
+
   constructor(props, context) {
     super(props);
 
     this.utils = utils;
 
     this._refsManager = new RefsManager();
+
+    __$$i18n._inject2(this);
 
     this.state = {
       pkgs: [],
@@ -79,204 +85,44 @@ class Test$$Page extends React.Component {
     return this._refsManager.getAll(refName);
   };
 
-  i18n = (i18nKey) => {
-    return _$$i18n(i18nKey);
-  };
-
   componentDidUpdate(prevProps, prevState, snapshot) {}
 
   componentWillUnmount() {}
 
   __jp__init() {
-    this.__jp__initEnv && this.__jp__initEnv();
-    this.__jp__initConfig && this.__jp__initConfig();
-    this.__jp__initDataSource && this.__jp__initDataSource();
-    this.__jp__initRouter && this.__jp__initRouter();
-    this.__jp__initUtils && this.__jp__initUtils();
+    /*...*/
   }
 
   __jp__initRouter() {
-    if (window.arsenal) {
-      this.$router = new window.jianpin.ArsenalRouter({
-        app: this.props.microApp,
-      });
-    } else {
-      this.$router = new window.jianpin.ArsenalRouter();
-    }
+    /*...*/
   }
 
   __jp__initDataSource() {
-    this.$apis = {
-      PKG_LIST: {
-        name: "打包列表",
-        code: "PKG_LIST",
-        url: "https://auto-nvwa.amap.com/ws/nvwa/cpp5x/packages/",
-        method: "GET",
-        dataHandler: (res) => res.data,
-      },
-      PROJECTS: {
-        name: "项目名称/渠道号",
-        code: "PROJECTS",
-        url: "http://auto-nvwa-staging.alibaba.com/ws/nvwa/cpp/select_projects/",
-        method: "GET",
-        state: "projects",
-        params: {
-          size: 5000,
-        },
-        dataHandler: (res) => {
-          return res.data.data.result.map((d) => {
-            const { id, channelId, project_name } = d;
-            return {
-              label: `${project_name} / ${channelId}`,
-              value: id,
-            };
-          });
-        },
-      },
-      RELOAD: {
-        name: "重新执行",
-        code: "RELOAD",
-        url: "https://auto-nvwa.amap.com/cpp/configbuild/rebuild/",
-        method: "GET",
-      },
-      BUILD_RESULT: {
-        name: "打包结果",
-        code: "BUILD_RESULT",
-        url: "https://auto-nvwa.amap.com/cpp/api/configbuild/get_build_result/",
-        method: "GET",
-        state: "results",
-        dataHandler: (res) => {
-          return res.data.result;
-        },
-      },
-      BUC_USER: {
-        name: "搜索用户",
-        code: "BUC_USER",
-        url: "https://auto-nvwa.amap.com/ws/nvwa/sso_users/",
-        method: "GET",
-        dataHandler: (res) => res.data.items,
-      },
-    };
-    this.$ds = new window.jianpin.DataSource(this, {});
+    /*...*/
   }
 
   __jp__initEnv() {
-    const hostname = window.location.hostname;
-    let env = "prod";
-
-    if (window.jianpin && window.jianpin.env === "dev") {
-      env = "dev";
-    } else if (window.arsenalConfig) {
-      env = window.arsenalConfig.env;
-    }
-
-    const urlSearchParams = new URLSearchParams(window.location.search);
-    const searchParams = {};
-
-    for (const [key, value] of urlSearchParams) {
-      searchParams[key] = value;
-    }
-
-    this.$env = env;
-    this.$searchParams = searchParams;
-
-    if (window.arsenal && window.arsenal.store) {
-      this.$user = window.arsenal.store.getState("user");
-      this.$store = window.arsenal.store;
-      window.arsenal.store.subscribe("user", () => {
-        this.$user = window.arsenal.store.getState("user");
-      });
-    } else {
-      this.$store = {
-        subscribe: () => {},
-        getState: () => {},
-      };
-      this.$user = this.__jp__mockUser || {};
-    }
+    /*...*/
   }
 
   __jp__initConfig() {
-    const __config = {
-      default: {},
-      dev: {},
-      daily: {},
-      pre: {},
-      prod: {},
-    };
-    this.$config = window.jianpin.utils.extend(
-      true,
-      {},
-      __config.default,
-      __config[this.$env]
-    );
+    /*...*/
   }
 
   __jp__initUtils() {
-    this.$utils = {
-      message: window.jianpin.utils.message,
-      axios: window.jianpin.utils.axios,
-      moment: window.jianpin.utils.moment,
-    };
+    /*...*/
   }
 
-  setSearchItem(item) {
-    const searchState = this.state.searchValues;
-
-    const reducer = (pre, key) => {
-      let value = searchState[key];
-
-      if (item.hasOwnProperty(key)) {
-        value = item[key];
-      }
-
-      return { ...pre, [key]: value || null };
-    };
-
-    const searchValues = Object.keys(searchState).reduce(reducer, {});
-    this.setState({
-      searchValues,
-    });
+  setSearchItem() {
+    /*...*/
   }
 
-  fetchProject(value, callback) {
-    if (this.projectTimeout) {
-      clearTimeout(this.projectTimeout);
-      this.projectTimeout = null;
-    }
-
-    this.currentProject = value;
-
-    const fake = () => {
-      this.$ds
-        .resolve("PROJECTS", {
-          params: {
-            search_param: value,
-          },
-        })
-        .then((res) => {
-          if (this.currentProject !== value) {
-            return;
-          }
-
-          callback(res || []);
-        });
-    };
-
-    this.projectTimeout = setTimeout(fake, 300);
+  fetchProject() {
+    /*...*/
   }
 
-  handleProjectSearch(value) {
-    if (value) {
-      this.fetchProject(value, (projects) => {
-        this.setState({
-          projects,
-        });
-      });
-    } else {
-      this.setState({
-        projects: [],
-      });
-    }
+  handleProjectSearch() {
+    /*...*/
   }
 
   handleProjectChange(id) {
@@ -285,49 +131,12 @@ class Test$$Page extends React.Component {
     });
   }
 
-  fetchUser(value, callback) {
-    if (this.userTimeout) {
-      clearTimeout(this.userTimeout);
-      this.userTimeout = null;
-    }
-
-    this.currentUser = value;
-
-    const fake = () => {
-      this.$ds
-        .resolve("BUC_USER", {
-          params: {
-            q: value,
-          },
-        })
-        .then((res) => {
-          if (this.currentUser !== value) {
-            return;
-          }
-
-          const data = res.slice(0, 8).map((r) => ({
-            label: `${r.id} / ${r.label}`,
-            value: r.id,
-          }));
-          callback(data);
-        });
-    };
-
-    this.userTimeout = setTimeout(fake, 300);
+  fetchUser() {
+    /*...*/
   }
 
-  handleUserSearch(value) {
-    if (value) {
-      this.fetchUser(value, (userOptions) => {
-        this.setState({
-          userOptions,
-        });
-      });
-    } else {
-      this.setState({
-        userOptions: [],
-      });
-    }
+  handleUserSearch() {
+    /*...*/
   }
 
   handleUserChange(user) {
@@ -338,20 +147,7 @@ class Test$$Page extends React.Component {
   }
 
   fetchPkgs() {
-    const { pageIndex, pageSize } = this.pageParams;
-    this.$ds
-      .resolve("PKG_LIST", {
-        params: { ...this.searchParams, page: pageIndex, size: pageSize },
-      })
-      .then((res) => {
-        const { result, page } = res.data;
-        const { count } = page;
-        this.setState({
-          isSearch: true,
-          pkgs: result,
-          total: count,
-        });
-      });
+    /*...*/
   }
 
   onPageChange(pageIndex, pageSize) {
@@ -370,115 +166,32 @@ class Test$$Page extends React.Component {
     return user.user_name;
   }
 
-  reload(id) {
-    if (!confirm("确实要重新执行？")) {
-      return;
-    }
-
-    this.$ds
-      .resolve("RELOAD", {
-        params: {
-          build_id: id,
-        },
-      })
-      .then((res) => {
-        const { code, message } = res.data.status;
-
-        if (code == 0) {
-          this.$utils.message.error(message);
-        } else {
-          const { pageIndex, pageSize } = this.pageParams;
-          this.onPageChange(pageIndex, pageSize);
-        }
-      })
-      .catch((err) => {
-        this.$utils.message.error(err.message);
-      });
+  reload() {
+    /*...*/
   }
 
-  handleResult(e) {
-    // e.persist();
-    e.preventDefault();
-    e.stopPropagation();
-    let href;
-    let tagName;
-    let target = e.target;
-
-    do {
-      tagName = target.tagName.toUpperCase();
-      href = target.getAttribute("href");
-      target = target.parentNode;
-    } while (!href && tagName !== "TD");
-
-    if (!href) {
-      return;
-    }
-
-    this.$ds
-      .resolve("BUILD_RESULT", {
-        params: {
-          build_id: href,
-        },
-      })
-      .then((res) => {
-        this.setState({
-          resultVisible: true,
-        });
-      })
-      .catch((err) => {
-        this.$utils.message.error(`打包结果获取失败: ${err.message}`);
-      });
+  handleResult() {
+    /*...*/
   }
 
   handleDetail() {
-    // 跳转详情页面 TODO
+    /*...*/
   }
 
   onResultCancel() {
-    this.setState({
-      resultVisible: false,
-    });
+    /*...*/
   }
 
-  formatResult(item) {
-    if (!item) {
-      return "暂无结果";
-    }
-
-    const { channel, plat, version, status } = item;
-    return [channel, plat, version, status].join("-");
+  formatResult() {
+    /*...*/
   }
 
   handleDownload() {
-    const { results } = this.state;
-
-    if (!results || results.length < 1) {
-      return;
-    }
-
-    let link = document.createElement("a");
-    link.style.display = "none";
-    document.body.appendChild(link);
-    results.forEach((r) => {
-      link.href = r.download_link;
-      link.click();
-    });
-    document.body.removeChild(link);
-    link = null;
+    /*...*/
   }
 
-  onFinish(f) {
-    const params = Object.keys(f).reduce((pre, key) => {
-      const value = f[key];
-
-      if (value === undefined) {
-        return pre;
-      }
-
-      return { ...pre, [key]: value };
-    }, {});
-    this.searchParams = params;
-    this.fetchPkgs();
+  onFinish() {
+    /*...*/
   }
 
   componentDidMount() {
@@ -496,8 +209,8 @@ class Test$$Page extends React.Component {
   }
 
   render() {
-    const __$$context = this;
-    const { state } = this;
+    const __$$context = this._context || this;
+    const { state } = __$$context;
     return (
       <div
         ref={this._refsManager.linkRef("outterView")}
@@ -505,7 +218,7 @@ class Test$$Page extends React.Component {
       >
         <Modal
           title="查看结果"
-          visible={this.state.resultVisible}
+          visible={__$$eval(() => this.state.resultVisible)}
           footer={
             <Button
               type="primary"
@@ -556,7 +269,9 @@ class Test$$Page extends React.Component {
           maskClosable={true}
         >
           <AliAutoDivDefault style={{ width: "100%" }}>
-            {!!(this.state.results && this.state.results.length > 0) && (
+            {!!__$$eval(
+              () => this.state.results && this.state.results.length > 0
+            ) && (
               <AliAutoDivDefault
                 style={{
                   width: "100%",
@@ -588,20 +303,26 @@ class Test$$Page extends React.Component {
                 </Button>
               </AliAutoDivDefault>
             )}
-            {this.state.results.map((item, index) =>
+            {__$$evalArray(() => this.state.results).map((item, index) =>
               ((__$$context) => (
                 <AliAutoDivDefault style={{ width: "100%", marginTop: "10px" }}>
                   <Typography.Text>
-                    {__$$context.formatResult(item)}
+                    {__$$eval(() => __$$context.formatResult(item))}
                   </Typography.Text>
-                  {!!item.download_link && (
-                    <Typography.Link href={item.download_link} target="_blank">
+                  {!!__$$eval(() => item.download_link) && (
+                    <Typography.Link
+                      href={__$$eval(() => item.download_link)}
+                      target="_blank"
+                    >
                       {" "}
                       - 点击下载
                     </Typography.Link>
                   )}
-                  {!!item.release_notes && (
-                    <Typography.Link href={item.release_notes} target="_blank">
+                  {!!__$$eval(() => item.release_notes) && (
+                    <Typography.Link
+                      href={__$$eval(() => item.release_notes)}
+                      target="_blank"
+                    >
                       {" "}
                       - 跳转发布节点
                     </Typography.Link>
@@ -665,7 +386,7 @@ class Test$$Page extends React.Component {
                       preserve={true}
                       scrollToFirstError={true}
                       size="middle"
-                      values={this.state.searchValues}
+                      values={__$$eval(() => this.state.searchValues)}
                     >
                       <Form.Item
                         label="项目名称/渠道号"
@@ -675,7 +396,7 @@ class Test$$Page extends React.Component {
                       >
                         <Select
                           style={{ width: "320px" }}
-                          options={this.state.projects}
+                          options={__$$eval(() => this.state.projects)}
                           showArrow={false}
                           tokenSeparators={[]}
                           showSearch={true}
@@ -741,14 +462,16 @@ class Test$$Page extends React.Component {
                       <Form.Item label="构建人" name="user_id">
                         <Select
                           style={{ width: "210px" }}
-                          options={this.state.userOptions}
+                          options={__$$eval(() => this.state.userOptions)}
                           showSearch={true}
                           defaultActiveFirstOption={false}
                           size="middle"
                           bordered={true}
                           filterOption={true}
                           optionFilterProp="label"
-                          notFoundContent={this.userNotFoundContent}
+                          notFoundContent={__$$eval(
+                            () => this.userNotFoundContent
+                          )}
                           showArrow={false}
                           placeholder="请输入构建人"
                           __events={{
@@ -855,13 +578,14 @@ class Test$$Page extends React.Component {
                 align="left"
                 flex={true}
               >
-                {!!(
-                  !this.state.isSearch ||
-                  (this.state.isSearch && this.state.pkgs.length > 0)
+                {!!__$$eval(
+                  () =>
+                    !this.state.isSearch ||
+                    (this.state.isSearch && this.state.pkgs.length > 0)
                 ) && (
                   <AliAutoSearchTableDefault
                     rowKey="key"
-                    dataSource={this.state.pkgs}
+                    dataSource={__$$eval(() => this.state.pkgs)}
                     columns={[
                       { title: "ID", dataIndex: "id", key: "name", width: 80 },
                       {
@@ -871,12 +595,11 @@ class Test$$Page extends React.Component {
                         width: 142,
                         render: (text, record, index) =>
                           ((__$$context) =>
-                            text
-                              .split(",")
-                              .map((item, index) =>
+                            __$$evalArray(() => text.split(",")).map(
+                              (item, index) =>
                                 ((__$$context) => (
                                   <Typography.Text style={{ display: "block" }}>
-                                    {item}
+                                    {__$$eval(() => item)}
                                   </Typography.Text>
                                 ))(
                                   __$$createChildContext(__$$context, {
@@ -884,7 +607,7 @@ class Test$$Page extends React.Component {
                                     index,
                                   })
                                 )
-                              ))(
+                            ))(
                             __$$createChildContext(__$$context, {
                               text,
                               record,
@@ -899,26 +622,30 @@ class Test$$Page extends React.Component {
                         render: (text, record, index) =>
                           ((__$$context) => (
                             <Tooltip
-                              title={(text || []).map((item, index) =>
-                                ((__$$context) => (
-                                  <Typography.Text
-                                    style={{
-                                      display: "block",
-                                      color: "#FFFFFF",
-                                    }}
-                                  >
-                                    {item.channelId + " / " + item.version}
-                                  </Typography.Text>
-                                ))(
-                                  __$$createChildContext(__$$context, {
-                                    item,
-                                    index,
-                                  })
-                                )
+                              title={__$$evalArray(() => text || []).map(
+                                (item, index) =>
+                                  ((__$$context) => (
+                                    <Typography.Text
+                                      style={{
+                                        display: "block",
+                                        color: "#FFFFFF",
+                                      }}
+                                    >
+                                      {__$$eval(
+                                        () =>
+                                          item.channelId + " / " + item.version
+                                      )}
+                                    </Typography.Text>
+                                  ))(
+                                    __$$createChildContext(__$$context, {
+                                      item,
+                                      index,
+                                    })
+                                  )
                               )}
                             >
                               <Typography.Text>
-                                {text[0].version}
+                                {__$$eval(() => text[0].version)}
                               </Typography.Text>
                             </Tooltip>
                           ))(
@@ -942,9 +669,9 @@ class Test$$Page extends React.Component {
                         render: (text, record, index) =>
                           ((__$$context) => [
                             <Typography.Text>
-                              {__$$context.statusDesc[text]}
+                              {__$$eval(() => __$$context.statusDesc[text])}
                             </Typography.Text>,
-                            !!(text === 2) && (
+                            !!__$$eval(() => text === 2) && (
                               <Icon
                                 type="SyncOutlined"
                                 size={16}
@@ -988,12 +715,17 @@ class Test$$Page extends React.Component {
                         dataIndex: "jenkins_link",
                         render: (text, record, index) =>
                           ((__$$context) => [
-                            !!text && (
-                              <Typography.Link href={text} target="_blank">
+                            !!__$$eval(() => text) && (
+                              <Typography.Link
+                                href={__$$eval(() => text)}
+                                target="_blank"
+                              >
                                 查看
                               </Typography.Link>
                             ),
-                            !!!text && <Typography.Text>暂无</Typography.Text>,
+                            !!__$$eval(() => !text) && (
+                              <Typography.Text>暂无</Typography.Text>
+                            ),
                           ])(
                             __$$createChildContext(__$$context, {
                               text,
@@ -1009,7 +741,7 @@ class Test$$Page extends React.Component {
                         width: 120,
                         render: (text, record, index) =>
                           ((__$$context) => [
-                            !!text && (
+                            !!__$$eval(() => text) && (
                               <Typography.Link
                                 href="http://rivermap.alibaba.net/dashboard/testExecute"
                                 target="_blank"
@@ -1017,7 +749,9 @@ class Test$$Page extends React.Component {
                                 查看
                               </Typography.Link>
                             ),
-                            !!!text && <Typography.Text>暂无</Typography.Text>,
+                            !!__$$eval(() => !text) && (
+                              <Typography.Text>暂无</Typography.Text>
+                            ),
                           ])(
                             __$$createChildContext(__$$context, {
                               text,
@@ -1100,7 +834,7 @@ class Test$$Page extends React.Component {
                                 );
                               }.bind(__$$context)}
                               ghost={false}
-                              href={text}
+                              href={__$$eval(() => text)}
                             >
                               查看
                             </Button>
@@ -1172,7 +906,7 @@ class Test$$Page extends React.Component {
                     ]}
                     actions={[]}
                     pagination={{
-                      total: this.state.total,
+                      total: __$$eval(() => this.state.total),
                       defaultPageSize: 10,
                       onPageChange: function () {
                         return this.onPageChange.apply(
@@ -1204,9 +938,9 @@ class Test$$Page extends React.Component {
                 align="left"
                 flex={true}
               >
-                {!!(this.state.pkgs.length < 1 && this.state.isSearch) && (
-                  <Empty description="暂无数据" />
-                )}
+                {!!__$$eval(
+                  () => this.state.pkgs.length < 1 && this.state.isSearch
+                ) && <Empty description="暂无数据" />}
               </NextP>
             </NextBlockCell>
           </NextBlock>
@@ -1217,6 +951,17 @@ class Test$$Page extends React.Component {
 }
 
 export default Test$$Page;
+
+function __$$eval(expr) {
+  try {
+    return expr();
+  } catch (error) {}
+}
+
+function __$$evalArray(expr) {
+  const res = __$$eval(expr);
+  return Array.isArray(res) ? res : [];
+}
 
 function __$$createChildContext(oldContext, ext) {
   const childContext = {

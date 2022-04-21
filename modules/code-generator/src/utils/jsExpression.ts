@@ -6,8 +6,6 @@ import { JSExpression, JSFunction, isJSExpression, isJSFunction } from '@alilc/l
 import { CodeGeneratorError, IScope } from '../types';
 import { transformExpressionLocalRef, ParseError } from './expressionParser';
 
-// demo: https://riddle.alibaba-inc.com/riddles/3d4c977f
-
 function parseFunction(content: string): t.FunctionExpression | null {
   try {
     const ast = parser.parse(`(${content});`);
@@ -81,10 +79,11 @@ export function isJsCode(value: unknown): boolean {
 
 export function generateExpression(value: any, scope: IScope): string {
   if (isJSExpression(value)) {
-    const exprVal = (value as JSExpression).value;
+    const exprVal = (value as JSExpression).value.trim();
     if (!exprVal) {
       return 'null';
     }
+
     const afterProcessWithLocals = transformExpressionLocalRef(exprVal, scope);
     return afterProcessWithLocals;
   }

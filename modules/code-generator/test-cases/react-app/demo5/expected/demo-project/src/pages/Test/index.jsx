@@ -1,3 +1,5 @@
+// 注意: 出码引擎注入的临时变量默认都以 "__$$" 开头，禁止在搭建的代码中直接访问。
+// 例外：react 框架的导出名和各种组件名除外。
 import React from "react";
 
 import {
@@ -22,7 +24,7 @@ import { AliAutoSearchTable } from "@alife/mc-assets-1935/build/lowcode/index.js
 
 import utils, { RefsManager } from "../../utils";
 
-import { i18n as _$$i18n } from "../../i18n";
+import * as __$$i18n from "../../i18n";
 
 import "./index.css";
 
@@ -31,12 +33,16 @@ const NextBlockCell = NextBlock.Cell;
 const AliAutoSearchTableDefault = AliAutoSearchTable.default;
 
 class Test$$Page extends React.Component {
+  _context = this;
+
   constructor(props, context) {
     super(props);
 
     this.utils = utils;
 
     this._refsManager = new RefsManager();
+
+    __$$i18n._inject2(this);
 
     this.state = {
       name: "nongzhou",
@@ -55,137 +61,39 @@ class Test$$Page extends React.Component {
     return this._refsManager.getAll(refName);
   };
 
-  i18n = (i18nKey) => {
-    return _$$i18n(i18nKey);
-  };
-
   componentWillUnmount() {
-    console.log("will umount");
+    /* ... */
   }
 
-  componentDidUpdate(prevProps, prevState, snapshot) {
-    console.log(this.state);
+  componentDidUpdate() {
+    /* ... */
   }
 
-  onChange(optionItem, data) {
-    this.setState({
-      selectedGateway: optionItem.value,
-    });
-    fetch(
-      "https://oneapi.alibaba-inc.com/mock/knk1s2w7/ws/tconf/gate/publish/list/" +
-        optionItem.value
-    )
-      .then((res) => {
-        return res.json();
-      })
-      .then((resData) => {
-        this.setState({
-          records: resData.data,
-        });
-      });
+  onChange() {
+    /* ... */
   }
 
-  getActions(item) {
-    const actions = [];
-
-    if (item.show_detail) {
-      actions.push({
-        text: "详情",
-        needConfirm: false,
-        handler: () => {
-          console.log("详情");
-        },
-      });
-    }
-
-    if (item.show_roll_back) {
-      actions.push({
-        text: "回滚到此版本",
-        needConfirm: false,
-        handler: () => {
-          console.log("回滚到此版本");
-        },
-      });
-    }
-
-    if (item.show_continue) {
-      actions.push({
-        text: "继续",
-        needConfirm: false,
-        handler: () => {
-          console.log("继续");
-        },
-      });
-    }
-
-    return actions;
+  getActions() {
+    /* ... */
   }
 
   onCreateOrder() {
-    if (!this.state.selectedGateway) {
-      alert("请先选择网关");
-      return;
-    }
-
-    this.setState({
-      modalVisible: true,
-    });
+    /* ... */
   }
 
   onCancelModal() {
-    this.setState({
-      modalVisible: false,
-    });
+    /* ... */
   }
 
   onConfirmCreateOrder() {
-    fetch(
-      `https://oneapi.alibaba-inc.com/mock/knk1s2w7/ws/tconf/gate/publish/app/${this.state.selectedGateway}`,
-      {
-        method: "POST",
-      }
-    )
-      .then((res) => {
-        return res.json();
-      })
-      .then((resJson) => {
-        console.log("create result: ", resJson);
-
-        if (resJson.result !== true) {
-          throw new Error(resJson.message + resJson.errdetail);
-        }
-      })
-      .then(() => {
-        console.log("创建发布单成功");
-        this.onCancelModal();
-      })
-      .catch((err) => {
-        console.error(err);
-        alert("创建失败");
-      });
+    /* ... */
   }
 
-  componentDidMount() {
-    this.setState({
-      gateways: [
-        {
-          domain: "uniproxy.amap.com:7001",
-          gate_code: "auto-edd-uniproxy",
-          gate_status_desc: "解锁",
-          label: "auto-edd-uniproxy",
-          value: "auto-edd-uniproxy",
-        },
-      ],
-    });
-    console.log("-----------", this, this.page);
-    setTimeout(() => {
-      console.log(this.state.gateways);
-    }, 1000);
-  }
+  componentDidMount() {}
 
   render() {
-    const __$$context = this;
-    const { state } = this;
+    const __$$context = this._context || this;
+    const { state } = __$$context;
     return (
       <div
         ref={this._refsManager.linkRef("outterView")}
@@ -244,7 +152,7 @@ class Test$$Page extends React.Component {
                         width: "400px",
                         display: "inline-block",
                       }}
-                      options={this.state.gateways}
+                      options={__$$eval(() => this.state.gateways)}
                       mode="single"
                       defaultValue={["auto-edd-uniproxy"]}
                       labelInValue={true}
@@ -312,7 +220,7 @@ class Test$$Page extends React.Component {
                   </Button>
                   <Modal
                     title="创建发布单"
-                    visible={this.state.modalVisible}
+                    visible={__$$eval(() => this.state.modalVisible)}
                     footer=""
                     __events={{
                       eventDataList: [
@@ -409,7 +317,7 @@ class Test$$Page extends React.Component {
                   </Modal>
                   <AliAutoSearchTableDefault
                     rowKey="key"
-                    dataSource={this.state.records}
+                    dataSource={__$$eval(() => this.state.records)}
                     columns={[
                       {
                         title: "发布名称",
@@ -434,7 +342,7 @@ class Test$$Page extends React.Component {
                       },
                       { title: "发布时间", dataIndex: "publish_id" },
                     ]}
-                    actions={this.actions || []}
+                    actions={__$$eval(() => this.actions || [])}
                     getActions={function () {
                       return this.getActions.apply(
                         this,
@@ -453,6 +361,17 @@ class Test$$Page extends React.Component {
 }
 
 export default Test$$Page;
+
+function __$$eval(expr) {
+  try {
+    return expr();
+  } catch (error) {}
+}
+
+function __$$evalArray(expr) {
+  const res = __$$eval(expr);
+  return Array.isArray(res) ? res : [];
+}
 
 function __$$createChildContext(oldContext, ext) {
   const childContext = {
